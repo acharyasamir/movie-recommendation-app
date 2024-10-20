@@ -1,33 +1,25 @@
 const express = require('express');
-const app = express();
-const port = 3000
-
-const axios = require('axios'); 
-
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
+const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
+
+const authRoutes = require('./routes/authRoutes');
+const movieRoutes = require('./routes/movieRoutes');
+
+// Use Routes
+app.use('/auth', authRoutes);
+app.use('/movies', movieRoutes);
+
 app.get('/', (req, res) => {
-    res.send('Starting Recommendation App')
-})
-
-app.get('/movie/:name', async (req, res) => {
-    const movieName = req.params.name;
-    const apiKey = process.env.TMDB_API_KEY;
-
-    try {
-        const response = await axios.get(`https://api.themoviedb.org/3/search/movie`, {
-            params: {
-                api_key: apiKey,
-                query: movieName
-            }
-        });
-        
-        res.json(response.data)
-    } catch(error) {
-        console.error('Error fetching the movie data: ', error)
-    }
+    res.send('Welcome to the Movie Recommendation App');
 });
 
-app.listen(port, () =>{
-    console.log(`Recommendation app listening on ports ${port}`);
-})
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+    console.log(`App is running on port ${port}`);
+});
